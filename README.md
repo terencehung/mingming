@@ -1,0 +1,1141 @@
+[index.html](https://github.com/user-attachments/files/26262831/index.html)
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 小英雄任務板</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky: #e0f4ff;
+  --cloud: #ffffff;
+  --sun: #FFD93D;
+  --green: #6BCB77;
+  --red: #FF6B6B;
+  --blue: #4ECDC4;
+  --orange: #FF9A3C;
+  --purple: #C77DFF;
+  --pink: #FF6EB4;
+  --dark: #2d3561;
+  --text: #3a3a5c;
+  --shadow: rgba(45,53,97,0.13);
+  --card: #fffdf7;
+  --radius: 20px;
+  --radius-xl: 32px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+  background: linear-gradient(160deg, #c9edff 0%, #e8f9ff 40%, #fef9e7 100%);
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── FLOATING CLOUDS ── */
+.clouds { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.cloud {
+  position: absolute;
+  background: rgba(255,255,255,0.7);
+  border-radius: 50px;
+  animation: floatCloud linear infinite;
+}
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+.cloud::before { width: 60%; height: 150%; top: -40%; left: 15%; }
+.cloud::after  { width: 45%; height: 130%; top: -30%; right: 15%; }
+
+@keyframes floatCloud {
+  from { transform: translateX(-200px); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  to   { transform: translateX(calc(100vw + 200px)); opacity: 0; }
+}
+
+/* ── STARS BACKGROUND ── */
+.stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.star {
+  position: absolute;
+  font-size: 18px;
+  animation: twinkle 3s ease-in-out infinite;
+  opacity: 0.3;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%       { opacity: 0.6;  transform: scale(1.3); }
+}
+
+/* ── WRAP ── */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.7) translateY(-20px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+.header-hero {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 4px;
+  animation: bounce 2s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.header h1 {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--dark);
+  text-shadow: 0 3px 0 rgba(255,255,255,0.8);
+  letter-spacing: 1px;
+}
+.header p { font-size: 15px; color: #7a80a0; margin-top: 4px; font-weight: 600; }
+
+/* ── STAR BAR ── */
+.starbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: white;
+  border-radius: 60px;
+  padding: 12px 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 24px var(--shadow);
+  animation: popIn 0.6s 0.1s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+.starbar .star-count {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--dark);
+  font-family: 'Nunito', sans-serif;
+}
+
+.starbar .star-icon { font-size: 26px; animation: spin 4s linear infinite; }
+@keyframes spin {
+  0%   { transform: rotate(0deg)   scale(1); }
+  25%  { transform: rotate(10deg)  scale(1.2); }
+  50%  { transform: rotate(0deg)   scale(1); }
+  75%  { transform: rotate(-10deg) scale(1.2); }
+  100% { transform: rotate(0deg)   scale(1); }
+}
+
+.starbar .level-badge {
+  background: linear-gradient(135deg, var(--sun), var(--orange));
+  color: white;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 3px 10px rgba(255,154,60,0.4);
+}
+
+.progress-wrap {
+  flex: 1; max-width: 160px;
+  background: #eee;
+  border-radius: 10px;
+  height: 12px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--sun), var(--orange));
+  transition: width 0.8s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  animation: popIn 0.6s 0.15s cubic-bezier(.34,1.56,.64,1) both;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.tab {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border-radius: 30px;
+  border: none;
+  background: rgba(255,255,255,0.7);
+  color: #7a80a0;
+  font-family: 'Nunito','Noto Sans TC',sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 3px 10px var(--shadow);
+}
+.tab.active {
+  background: var(--dark);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(45,53,97,0.35);
+}
+.tab:not(.active):hover {
+  background: white;
+  transform: translateY(-1px);
+}
+
+/* ── SECTION TITLE ── */
+.sec-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--dark);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-title .bubble {
+  background: var(--dark);
+  color: white;
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+/* ── TASK CARD ── */
+.task-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media(max-width:600px){ .task-grid { grid-template-columns: 1fr; } }
+
+.task-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 6px 20px var(--shadow);
+  border: 3px solid transparent;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.task-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  border-radius: 20px 20px 0 0;
+}
+.task-card.cat-homework::before { background: linear-gradient(90deg,#6BCB77,#4ECDC4); }
+.task-card.cat-exercise::before { background: linear-gradient(90deg,#FF9A3C,#FFD93D); }
+.task-card.cat-habit::before    { background: linear-gradient(90deg,#C77DFF,#FF6EB4); }
+
+.task-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px var(--shadow);
+}
+.task-card.done {
+  background: #f0fff4;
+  border-color: var(--green);
+  opacity: 0.85;
+}
+.task-card.failed {
+  background: #fff5f5;
+  border-color: var(--red);
+  opacity: 0.85;
+}
+
+.task-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.task-emoji {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 0.3s;
+}
+.task-card:hover .task-emoji { transform: rotate(-8deg) scale(1.15); }
+
+.task-info { flex: 1; }
+.task-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dark);
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+.task-desc { font-size: 12px; color: #9a9abb; font-weight: 600; }
+
+.task-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.tag {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.tag-reward { background: #fff3cd; color: #b8860b; }
+.tag-penalty { background: #fde8e8; color: #c0392b; }
+.tag-pts { background: #e8f5e9; color: #2e7d32; }
+
+.task-btns {
+  display: flex;
+  gap: 8px;
+}
+.btn-done, .btn-fail {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 14px;
+  border: none;
+  font-family: 'Nunito','Noto Sans TC',sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-done {
+  background: linear-gradient(135deg, #6BCB77, #4ECDC4);
+  color: white;
+  box-shadow: 0 4px 12px rgba(107,203,119,0.4);
+}
+.btn-done:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(107,203,119,0.5); }
+.btn-fail {
+  background: linear-gradient(135deg, #FF6B6B, #ff9a9a);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255,107,107,0.35);
+}
+.btn-fail:hover { transform: scale(1.05); }
+
+.task-status {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+}
+.task-status.show { display: flex; }
+.status-done { background: #e8faf0; color: #2e7d32; }
+.status-fail { background: #fde8e8; color: #c0392b; }
+
+/* ── REWARD / PENALTY POPUP ── */
+.popup-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.popup-overlay.show { opacity: 1; pointer-events: all; }
+
+.popup {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 40px 36px;
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+  transform: scale(0.7);
+  transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  position: relative;
+  overflow: hidden;
+}
+.popup-overlay.show .popup { transform: scale(1); }
+
+.popup.reward-popup { border: 4px solid var(--green); }
+.popup.penalty-popup { border: 4px solid var(--red); }
+
+.popup-emoji { font-size: 72px; margin-bottom: 12px; animation: bigBounce 0.6s cubic-bezier(.34,1.56,.64,1); }
+@keyframes bigBounce {
+  0%   { transform: scale(0) rotate(-20deg); }
+  60%  { transform: scale(1.2) rotate(8deg); }
+  100% { transform: scale(1)   rotate(0); }
+}
+
+.popup h2 {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+.popup .popup-msg {
+  font-size: 15px;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.popup .pts-badge {
+  display: inline-block;
+  padding: 8px 24px;
+  border-radius: 30px;
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 20px;
+}
+.reward-popup .pts-badge  { background: linear-gradient(135deg,#6BCB77,#4ECDC4); color: white; }
+.penalty-popup .pts-badge { background: linear-gradient(135deg,#FF6B6B,#ff9a9a); color: white; }
+
+.btn-close {
+  background: var(--dark);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 36px;
+  font-family: 'Nunito','Noto Sans TC',sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.btn-close:hover { transform: scale(1.05); }
+
+/* ── CONFETTI ── */
+.confetti-piece {
+  position: fixed;
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 9999;
+  animation: confettiFall 1.8s ease-in forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-100px) rotate(0deg) scale(1); opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+}
+
+/* ── SHAKE ── */
+@keyframes shake {
+  0%,100%{ transform: translateX(0); }
+  20%    { transform: translateX(-10px) rotate(-3deg); }
+  40%    { transform: translateX(10px)  rotate(3deg); }
+  60%    { transform: translateX(-8px)  rotate(-2deg); }
+  80%    { transform: translateX(8px)   rotate(2deg); }
+}
+.shaking { animation: shake 0.5s ease; }
+
+/* ── REWARD SHOP ── */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media(max-width:600px){ .shop-grid { grid-template-columns: 1fr 1fr; } }
+
+.shop-item {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px 12px;
+  text-align: center;
+  box-shadow: 0 5px 18px var(--shadow);
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.shop-item:hover {
+  transform: translateY(-4px);
+  border-color: var(--sun);
+  box-shadow: 0 10px 24px rgba(255,217,61,0.3);
+}
+.shop-item.redeemed {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #ccc;
+}
+.shop-item .s-emoji { font-size: 40px; margin-bottom: 8px; }
+.shop-item .s-name  { font-size: 13px; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+.shop-item .s-cost  {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: linear-gradient(135deg, var(--sun), var(--orange));
+  color: white;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ── HISTORY LOG ── */
+.log-list { display: flex; flex-direction: column; gap: 10px; }
+.log-item {
+  display: flex; align-items: center; gap: 12px;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 3px 12px var(--shadow);
+  animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.log-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.log-item.log-reward .log-dot { background: var(--green); }
+.log-item.log-penalty .log-dot { background: var(--red); }
+.log-item.log-redeem  .log-dot { background: var(--orange); }
+
+.log-text { flex: 1; font-size: 13px; font-weight: 700; color: var(--dark); }
+.log-time { font-size: 11px; color: #bbb; font-weight: 600; }
+.log-pts  { font-size: 14px; font-weight: 900; }
+.log-item.log-reward  .log-pts { color: var(--green); }
+.log-item.log-penalty .log-pts { color: var(--red); }
+.log-item.log-redeem  .log-pts { color: var(--orange); }
+
+/* ── ADD TASK FORM ── */
+.add-form {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: 0 8px 28px var(--shadow);
+  margin-bottom: 24px;
+  animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.add-form h3 { font-size: 16px; font-weight: 900; color: var(--dark); margin-bottom: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media(max-width:500px){ .form-row { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 12px; font-weight: 800; color: #7a80a0; }
+.field input, .field select {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid #e8eaf0;
+  font-family: 'Nunito','Noto Sans TC',sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field input:focus, .field select:focus { border-color: var(--blue); }
+.btn-add {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, var(--dark), #4a5480);
+  color: white;
+  font-family: 'Nunito','Noto Sans TC',sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(45,53,97,0.4); }
+
+/* ── PENALTY TASKS ── */
+.penalty-card {
+  background: #fff5f5;
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 5px 18px var(--shadow);
+  border: 3px solid #ffcdd2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.penalty-card .p-emoji { font-size: 30px; }
+.penalty-card .p-info { flex: 1; }
+.penalty-card .p-name { font-size: 14px; font-weight: 800; color: var(--dark); }
+.penalty-card .p-desc { font-size: 12px; color: #e57373; font-weight: 600; margin-top: 2px; }
+.btn-pstart {
+  background: linear-gradient(135deg,#FF6B6B,#ff9a9a);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-family:'Nunito','Noto Sans TC',sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pstart:hover { transform: scale(1.05); }
+.btn-pdone {
+  background: linear-gradient(135deg,#6BCB77,#4ECDC4);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-family:'Nunito','Noto Sans TC',sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pdone:hover { transform: scale(1.05); }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 40px; color: #bbb; }
+.empty .e-icon { font-size: 48px; margin-bottom: 10px; }
+.empty p { font-size: 14px; font-weight: 700; }
+
+/* ── LEVEL UP OVERLAY ── */
+.levelup-overlay {
+  position: fixed; inset: 0;
+  background: rgba(255,255,255,0.92);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.levelup-overlay.show { opacity: 1; pointer-events: all; }
+.levelup-big { font-size: 90px; animation: bigBounce 0.7s; }
+.levelup-text { font-size: 36px; font-weight: 900; color: var(--dark); margin: 10px 0; }
+.levelup-sub  { font-size: 18px; color: #888; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- Clouds -->
+<div class="clouds" id="clouds"></div>
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-hero" id="heroEmoji">🦸</div>
+    <h1>小英雄任務板</h1>
+    <p>完成任務賺星星，累積星星換獎勵！</p>
+  </div>
+
+  <!-- STAR BAR -->
+  <div class="starbar">
+    <span class="star-icon">⭐</span>
+    <span class="star-count"><span id="starCount">0</span> 顆星</span>
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <span class="level-badge" id="levelBadge">Lv.1 新手英雄</span>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('tasks')">📋 今日任務</button>
+    <button class="tab" onclick="switchTab('penalties')">😤 懲罰任務</button>
+    <button class="tab" onclick="switchTab('shop')">🎁 獎勵商店</button>
+    <button class="tab" onclick="switchTab('history')">📖 記錄本</button>
+    <button class="tab" onclick="switchTab('add')">➕ 新增任務</button>
+  </div>
+
+  <!-- ── TAB: TASKS ── -->
+  <div class="tab-content active" id="tab-tasks">
+    <div class="sec-title"><span class="bubble">📚</span>功課 &amp; 作業</div>
+    <div class="task-grid" id="grid-homework"></div>
+
+    <div class="sec-title"><span class="bubble">🏃</span>運動 &amp; 體能</div>
+    <div class="task-grid" id="grid-exercise"></div>
+
+    <div class="sec-title"><span class="bubble">✨</span>生活好習慣</div>
+    <div class="task-grid" id="grid-habit"></div>
+  </div>
+
+  <!-- ── TAB: PENALTIES ── -->
+  <div class="tab-content" id="tab-penalties">
+    <div class="sec-title" style="color:var(--red)"><span class="bubble" style="background:var(--red)">😤</span>待完成的懲罰任務</div>
+    <div id="penaltyList"></div>
+  </div>
+
+  <!-- ── TAB: SHOP ── -->
+  <div class="tab-content" id="tab-shop">
+    <div class="sec-title"><span class="bubble" style="background:var(--orange)">🎁</span>獎勵商店（用星星換！）</div>
+    <div class="shop-grid" id="shopGrid"></div>
+  </div>
+
+  <!-- ── TAB: HISTORY ── -->
+  <div class="tab-content" id="tab-history">
+    <div class="sec-title"><span class="bubble" style="background:var(--purple)">📖</span>最近紀錄</div>
+    <div class="log-list" id="logList"></div>
+  </div>
+
+  <!-- ── TAB: ADD ── -->
+  <div class="tab-content" id="tab-add">
+    <div class="add-form">
+      <h3>➕ 新增自訂任務</h3>
+      <div class="form-row">
+        <div class="field">
+          <label>任務名稱</label>
+          <input type="text" id="newName" placeholder="例：背5個英文單字" maxlength="20">
+        </div>
+        <div class="field">
+          <label>圖示表情</label>
+          <input type="text" id="newEmoji" placeholder="例：📝" maxlength="2" value="⭐">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>類別</label>
+          <select id="newCat">
+            <option value="homework">📚 功課</option>
+            <option value="exercise">🏃 運動</option>
+            <option value="habit">✨ 習慣</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>達成獎勵（顆星）</label>
+          <input type="number" id="newReward" value="3" min="1" max="20">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>未達成扣星（顆）</label>
+          <input type="number" id="newPenalty" value="2" min="0" max="10">
+        </div>
+        <div class="field">
+          <label>達成說明</label>
+          <input type="text" id="newDesc" placeholder="例：完成今天所有作業" maxlength="20">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>獎勵說明</label>
+          <input type="text" id="newRewardDesc" placeholder="例：多玩30分鐘Switch">
+        </div>
+        <div class="field">
+          <label>懲罰說明</label>
+          <input type="text" id="newPenaltyDesc" placeholder="例：抄寫10個英文單字">
+        </div>
+      </div>
+      <button class="btn-add" onclick="addTask()">🚀 加入任務板！</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup" id="popup">
+    <div class="popup-emoji" id="popupEmoji">🎉</div>
+    <h2 id="popupTitle">太棒了！</h2>
+    <div class="popup-msg" id="popupMsg">你完成了任務！</div>
+    <div class="pts-badge" id="popupPts">+5 ⭐</div>
+    <button class="btn-close" onclick="closePopup()">好耶！關閉</button>
+  </div>
+</div>
+
+<!-- LEVEL UP -->
+<div class="levelup-overlay" id="levelupOverlay">
+  <div class="levelup-big">🎊</div>
+  <div class="levelup-text" id="levelupText">升級了！</div>
+  <div class="levelup-sub" id="levelupSub">恭喜成為新等級英雄！</div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────
+let stars = parseInt(localStorage.getItem('heroStars') || '0');
+let logs  = JSON.parse(localStorage.getItem('heroLogs') || '[]');
+let penalties = JSON.parse(localStorage.getItem('heroPenalties') || '[]');
+let redeemedShop = JSON.parse(localStorage.getItem('heroShop') || '[]');
+
+const levels = [
+  { min:0,   label:'Lv.1 新手英雄',   next:20,  hero:'🦸' },
+  { min:20,  label:'Lv.2 見習冒險家', next:50,  hero:'⚔️' },
+  { min:50,  label:'Lv.3 勇敢戰士',   next:100, hero:'🛡️' },
+  { min:100, label:'Lv.4 超級英雄',   next:180, hero:'🦸‍♂️'},
+  { min:180, label:'Lv.5 傳說英雄王', next:999, hero:'👑' },
+];
+
+const taskDefs = [
+  // homework
+  { id:'hw1', cat:'homework', emoji:'📝', name:'完成今天的作業', desc:'把所有作業寫完', reward:5, penalty:3, rewardMsg:'作業都做完了！真的好棒！', penaltyMsg:'要抄寫今天漏掉的功課10次', done:null },
+  { id:'hw2', cat:'homework', emoji:'📖', name:'預習明天課程', desc:'看明天的課本15分鐘', reward:3, penalty:2, rewardMsg:'多看書就是最棒的！', penaltyMsg:'用課本第一頁默寫3遍', done:null },
+  { id:'hw3', cat:'homework', emoji:'🔢', name:'數學練習題', desc:'完成10題計算練習', reward:4, penalty:2, rewardMsg:'數學高手出現啦！', penaltyMsg:'重做剛才的題目，請爸媽批改', done:null },
+  // exercise
+  { id:'ex1', cat:'exercise', emoji:'🏃', name:'跑步20分鐘', desc:'繞公園跑兩圈', reward:4, penalty:2, rewardMsg:'哇！跑步英雄！身體超健康！', penaltyMsg:'在家做20下深蹲補回來', done:null },
+  { id:'ex2', cat:'exercise', emoji:'⚽', name:'練習踢球30分鐘', desc:'練習傳球和射門', reward:3, penalty:1, rewardMsg:'運動細胞超強！', penaltyMsg:'做10個伏地挺身', done:null },
+  // habit
+  { id:'hb1', cat:'habit', emoji:'🛏️', name:'9點前上床睡覺', desc:'準時關燈睡覺', reward:3, penalty:2, rewardMsg:'睡眠充足才會長高！', penaltyMsg:'明天早起提早30分鐘起床', done:null },
+  { id:'hb2', cat:'habit', emoji:'🧹', name:'整理自己的房間', desc:'玩具書包全部歸位', reward:3, penalty:2, rewardMsg:'房間整整齊齊！媽媽說讚！', penaltyMsg:'額外打掃客廳10分鐘', done:null },
+  { id:'hb3', cat:'habit', emoji:'🍱', name:'吃完全部的晚餐', desc:'不挑食把飯吃光光', reward:3, penalty:1, rewardMsg:'不挑食的好孩子！身體棒棒！', penaltyMsg:'飯後幫忙洗碗一次', done:null },
+];
+
+const shopItems = [
+  { id:'s1', emoji:'🎮', name:'多玩30分鐘遊戲',   cost:10 },
+  { id:'s2', emoji:'🍦', name:'選一個冰淇淋口味', cost:8 },
+  { id:'s3', emoji:'🎬', name:'看一部電影',       cost:15 },
+  { id:'s4', emoji:'🍕', name:'選今晚吃披薩',     cost:12 },
+  { id:'s5', emoji:'🧸', name:'選一個小玩具',     cost:25 },
+  { id:'s6', emoji:'🌊', name:'週末去游泳',       cost:20 },
+];
+
+// load task done states
+let taskStates = JSON.parse(localStorage.getItem('heroTasks') || '{}');
+
+function saveAll() {
+  localStorage.setItem('heroStars', stars);
+  localStorage.setItem('heroLogs', JSON.stringify(logs));
+  localStorage.setItem('heroPenalties', JSON.stringify(penalties));
+  localStorage.setItem('heroShop', JSON.stringify(redeemedShop));
+  localStorage.setItem('heroTasks', JSON.stringify(taskStates));
+}
+
+// ── CLOUDS & STARS ────────────────────────────────
+(function() {
+  const c = document.getElementById('clouds');
+  for(let i=0;i<4;i++){
+    const el = document.createElement('div');
+    el.className = 'cloud';
+    const size = 80 + Math.random()*100;
+    el.style.cssText = `width:${size}px;height:${size*0.4}px;top:${5+Math.random()*25}%;animation-duration:${30+Math.random()*40}s;animation-delay:${-Math.random()*40}s;`;
+    c.appendChild(el);
+  }
+  const s = document.getElementById('stars');
+  const emojis = ['✨','⭐','🌟','💫'];
+  for(let i=0;i<14;i++){
+    const el = document.createElement('div');
+    el.className = 'star';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${14+Math.random()*16}px;`;
+    s.appendChild(el);
+  }
+})();
+
+// ── UI ────────────────────────────────────────────
+function getCurrentLevel() {
+  for(let i=levels.length-1;i>=0;i--){
+    if(stars >= levels[i].min) return levels[i];
+  }
+  return levels[0];
+}
+
+function updateStarUI(prevLevel) {
+  const lv = getCurrentLevel();
+  document.getElementById('starCount').textContent = stars;
+  document.getElementById('levelBadge').textContent = lv.label;
+  document.getElementById('heroEmoji').textContent  = lv.hero;
+  const pct = Math.min(100, ((stars - lv.min) / (lv.next - lv.min)) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  if(prevLevel && prevLevel.label !== lv.label) {
+    showLevelUp(lv);
+  }
+}
+
+function showLevelUp(lv) {
+  const ov = document.getElementById('levelupOverlay');
+  document.getElementById('levelupText').textContent = `🎊 升級！ ${lv.label}`;
+  document.getElementById('levelupSub').textContent  = `恭喜解鎖新稱號！繼續加油！`;
+  ov.classList.add('show');
+  setTimeout(() => ov.classList.remove('show'), 2800);
+}
+
+// ── TASK RENDERING ────────────────────────────────
+function renderTasks() {
+  const cats = { homework:'grid-homework', exercise:'grid-exercise', habit:'grid-habit' };
+  Object.values(cats).forEach(id => document.getElementById(id).innerHTML = '');
+
+  const allTasks = [
+    ...taskDefs,
+    ...Object.values(taskStates).filter(t => t.custom)
+  ];
+
+  // dedupe custom by id
+  const seen = new Set();
+  const tasks = allTasks.filter(t => {
+    if(seen.has(t.id)) return false;
+    seen.add(t.id);
+    return true;
+  });
+
+  tasks.forEach((task, i) => {
+    const state = taskStates[task.id];
+    const isDone   = state && state.result === 'done';
+    const isFailed = state && state.result === 'fail';
+
+    const card = document.createElement('div');
+    card.className = `task-card cat-${task.cat}${isDone?' done':''}${isFailed?' failed':''}`;
+    card.style.animationDelay = (i * 0.06) + 's';
+
+    card.innerHTML = `
+      <div class="task-top">
+        <div class="task-emoji">${task.emoji}</div>
+        <div class="task-info">
+          <div class="task-name">${task.name}</div>
+          <div class="task-desc">${task.desc}</div>
+        </div>
+      </div>
+      <div class="task-tags">
+        <span class="tag tag-pts">+${task.reward}⭐ 獎勵</span>
+        ${task.penalty>0?`<span class="tag tag-penalty">-${task.penalty}⭐ 懲罰</span>`:''}
+      </div>
+      ${!isDone && !isFailed ? `
+        <div class="task-btns">
+          <button class="btn-done" onclick="completeTask('${task.id}','done')">✅ 完成！</button>
+          <button class="btn-fail" onclick="completeTask('${task.id}','fail')">😞 沒做到</button>
+        </div>
+      ` : `
+        <div class="task-status show ${isDone?'status-done':'status-fail'}">
+          ${isDone ? `✅ 完成！+${task.reward}⭐` : `😞 未完成 -${task.penalty}⭐`}
+        </div>
+      `}
+    `;
+
+    const gridId = cats[task.cat] || 'grid-habit';
+    document.getElementById(gridId).appendChild(card);
+  });
+}
+
+function completeTask(taskId, result) {
+  const prevLv = getCurrentLevel();
+  const task = [...taskDefs, ...Object.values(taskStates).filter(t=>t.custom)].find(t=>t.id===taskId);
+  if(!task) return;
+
+  taskStates[taskId] = { ...(taskStates[taskId]||{}), result };
+
+  if(result === 'done') {
+    stars += task.reward;
+    addLog('reward', `完成「${task.name}」`, `+${task.reward}⭐`);
+    showPopup('reward', task.emoji, '太棒了！任務完成！',
+      `${task.rewardMsg}`, `+${task.reward} ⭐ 星星`);
+    fireConfetti();
+  } else {
+    stars = Math.max(0, stars - task.penalty);
+    addLog('penalty', `未完成「${task.name}」`, `-${task.penalty}⭐`);
+    if(task.penalty > 0) {
+      penalties.push({
+        id:'p'+Date.now(),
+        name: task.penaltyMsg,
+        from: task.name,
+        emoji: '😤',
+        done: false
+      });
+      renderPenalties();
+    }
+    showPopup('penalty', '😢', '這次沒做到…', task.penaltyMsg, `-${task.penalty} ⭐ 扣星`);
+    shakeStar();
+  }
+
+  saveAll();
+  updateStarUI(prevLv);
+  renderTasks();
+}
+
+// ── POPUP ─────────────────────────────────────────
+function showPopup(type, emoji, title, msg, pts) {
+  const ov = document.getElementById('popupOverlay');
+  const p  = document.getElementById('popup');
+  document.getElementById('popupEmoji').textContent = emoji;
+  document.getElementById('popupTitle').textContent = title;
+  document.getElementById('popupMsg').textContent   = msg;
+  document.getElementById('popupPts').textContent   = pts;
+  p.className  = `popup ${type}-popup`;
+  ov.classList.add('show');
+}
+function closePopup() {
+  document.getElementById('popupOverlay').classList.remove('show');
+}
+
+// ── CONFETTI ──────────────────────────────────────
+function fireConfetti() {
+  const colors = ['#FFD93D','#6BCB77','#4ECDC4','#FF6EB4','#C77DFF','#FF9A3C'];
+  for(let i=0;i<40;i++){
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left:${10+Math.random()*80}%;
+        top: -20px;
+        background: ${colors[Math.floor(Math.random()*colors.length)]};
+        transform: rotate(${Math.random()*360}deg);
+        animation-duration: ${1.2+Math.random()*1}s;
+        animation-delay: ${Math.random()*0.4}s;
+        border-radius: ${Math.random()>0.5?'50%':'3px'};
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }, i * 30);
+  }
+}
+
+function shakeStar() {
+  const sb = document.querySelector('.starbar');
+  sb.classList.add('shaking');
+  setTimeout(() => sb.classList.remove('shaking'), 600);
+}
+
+// ── PENALTIES ─────────────────────────────────────
+function renderPenalties() {
+  const list = document.getElementById('penaltyList');
+  const active = penalties.filter(p => !p.done);
+  if(active.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="e-icon">😇</div><p>目前沒有懲罰任務，繼續保持！</p></div>`;
+    return;
+  }
+  list.innerHTML = '';
+  active.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'penalty-card';
+    el.innerHTML = `
+      <div class="p-emoji">${p.emoji}</div>
+      <div class="p-info">
+        <div class="p-name">${p.name}</div>
+        <div class="p-desc">因為：${p.from}</div>
+      </div>
+      <button class="btn-pdone" onclick="donePenalty('${p.id}')">完成了！</button>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function donePenalty(pid) {
+  const prevLv = getCurrentLevel();
+  penalties = penalties.map(p => p.id===pid ? {...p,done:true} : p);
+  stars += 1;
+  addLog('reward', '完成懲罰任務', '+1⭐');
+  showPopup('reward','💪','懲罰完成！','你完成了懲罰任務，好樣的！','+1 ⭐ 星星');
+  fireConfetti();
+  saveAll();
+  updateStarUI(prevLv);
+  renderPenalties();
+}
+
+// ── SHOP ──────────────────────────────────────────
+function renderShop() {
+  const grid = document.getElementById('shopGrid');
+  grid.innerHTML = '';
+  shopItems.forEach((item,i) => {
+    const redeemed = redeemedShop.includes(item.id);
+    const el = document.createElement('div');
+    el.className = `shop-item${redeemed?' redeemed':''}`;
+    el.style.animationDelay = (i*0.07)+'s';
+    el.onclick = () => !redeemed && redeemItem(item);
+    el.innerHTML = `
+      <div class="s-emoji">${item.emoji}</div>
+      <div class="s-name">${item.name}</div>
+      <div class="s-cost">${item.cost} ⭐</div>
+      ${redeemed ? `<div style="font-size:12px;color:#bbb;margin-top:6px;font-weight:700">已兌換</div>` : ''}
+    `;
+    grid.appendChild(el);
+  });
+}
+
+function redeemItem(item) {
+  if(stars < item.cost) {
+    showPopup('penalty','😢','星星不夠！',`還需要 ${item.cost - stars} 顆星星才能換喔！`, `需要 ${item.cost} ⭐`);
+    return;
+  }
+  const prevLv = getCurrentLevel();
+  stars -= item.cost;
+  redeemedShop.push(item.id);
+  addLog('redeem', `兌換「${item.name}」`, `-${item.cost}⭐`);
+  showPopup('reward', item.emoji, '兌換成功！', `你換到了：${item.name}\n記得去找爸媽確認喔！`, `-${item.cost} ⭐`);
+  saveAll();
+  updateStarUI(prevLv);
+  renderShop();
+}
+
+// ── LOG ───────────────────────────────────────────
+function addLog(type, text, pts) {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  logs.unshift({ type, text, pts, time: timeStr });
+  if(logs.length > 50) logs = logs.slice(0,50);
+  renderLog();
+}
+
+function renderLog() {
+  const list = document.getElementById('logList');
+  if(logs.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="e-icon">📖</div><p>還沒有任何紀錄，快去完成任務吧！</p></div>`;
+    return;
+  }
+  list.innerHTML = '';
+  logs.slice(0,20).forEach((l,i) => {
+    const el = document.createElement('div');
+    el.className = `log-item log-${l.type}`;
+    el.style.animationDelay = (i*0.04)+'s';
+    el.innerHTML = `
+      <div class="log-dot"></div>
+      <div class="log-text">${l.text}</div>
+      <div class="log-time">${l.time}</div>
+      <div class="log-pts">${l.pts}</div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// ── ADD TASK ──────────────────────────────────────
+function addTask() {
+  const name = document.getElementById('newName').value.trim();
+  if(!name) { alert('請輸入任務名稱！'); return; }
+  const id = 'custom_' + Date.now();
+  const task = {
+    id,
+    cat: document.getElementById('newCat').value,
+    emoji: document.getElementById('newEmoji').value || '⭐',
+    name,
+    desc: document.getElementById('newDesc').value || '完成任務',
+    reward: parseInt(document.getElementById('newReward').value) || 3,
+    penalty: parseInt(document.getElementById('newPenalty').value) || 2,
+    rewardMsg: document.getElementById('newRewardDesc').value || '任務完成！做得很棒！',
+    penaltyMsg: document.getElementById('newPenaltyDesc').value || '要完成補救任務',
+    custom: true
+  };
+  taskStates[id] = task;
+  saveAll();
+  renderTasks();
+  switchTab('tasks');
+  ['newName','newDesc','newRewardDesc','newPenaltyDesc'].forEach(id => document.getElementById(id).value='');
+  showPopup('reward','🚀','新任務加入！',`「${name}」已加到任務板了！加油！`,`+${task.reward}⭐ 可拿`);
+}
+
+// ── TABS ──────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  const tabs=['tasks','penalties','shop','history','add'];
+  document.querySelectorAll('.tab')[tabs.indexOf(tab)]?.classList.add('active');
+
+  if(tab==='shop')    renderShop();
+  if(tab==='history') renderLog();
+  if(tab==='penalties') renderPenalties();
+}
+
+// ── INIT ──────────────────────────────────────────
+updateStarUI(null);
+renderTasks();
+renderPenalties();
+renderLog();
+</script>
+</body>
+</html>
